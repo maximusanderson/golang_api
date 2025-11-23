@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  golang-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      PORT: 8080
+      DB_HOST: mynew-postgres-jgcyi2
+      DB_PORT: 5432
+      DB_USER: db-user
+      DB_PASSWORD: db-password
+      DB_NAME: db-name
+      DB_SSLMODE: disable
+      SUPERTOKENS_CONNECTION_URI: http://supertokens:3567
+      SUPERTOKENS_API_KEY: ""
+    ports:
+      - "8080:8080"
+    depends_on:
+      - supertokens
+    networks:
+      - dokploy-network
+    restart: unless-stopped
+
+  supertokens:
+    image: registry.supertokens.io/supertokens/supertokens-postgresql
+    environment:
+      POSTGRESQL_CONNECTION_URI: postgresql://db-user:db-password@mynew-postgres-jgcyi2:5432/db-name
+    ports:
+      - "3567:3567"
+    networks:
+      - dokploy-network
+    restart: unless-stopped
+
+networks:
+  dokploy-network:
+    external: true
